@@ -1,0 +1,177 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", ":dependencyDashboard", ":gitSignOff"],
+  "timezone": "Europe/London",
+  "schedule": ["* 22-23,0-4 * * *", "* * * * 0,6"],
+  "labels": ["dependencies", "renovate"],
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "semanticCommits": "enabled",
+  "semanticCommitScope": "deps",
+  "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"],
+  "vulnerabilityAlerts": {
+    "enabled": true,
+    "labels": ["security"],
+    "schedule": ["at any time"]
+  },
+  "packageRules": [
+    {
+      "description": "Group Kubernetes dependencies",
+      "groupName": "kubernetes packages",
+      "matchDatasources": ["go"],
+      "matchPackageNames": ["k8s.io/", "sigs.k8s.io/"],
+      "groupSlug": "kubernetes"
+    },
+    {
+      "description": "Group Azure SDK dependencies",
+      "groupName": "Azure SDK",
+      "matchDatasources": ["go"],
+      "matchPackagePrefixes": ["github.com/Azure/azure-sdk-for-go/"]
+    },
+    {
+      "description": "Group AWS SDK dependencies",
+      "groupName": "AWS SDK",
+      "matchDatasources": ["go"],
+      "matchPackagePrefixes": ["github.com/aws/aws-sdk-go-v2"]
+    },
+    {
+      "description": "Automerge patch updates for test dependencies",
+      "matchDepTypes": ["devDependencies"],
+      "matchUpdateTypes": ["patch"],
+      "automerge": true
+    },
+    {
+      "description": "Automerge digest updates",
+      "matchDatasources": ["docker"],
+      "matchUpdateTypes": ["digest"],
+      "automerge": true
+    },
+    {
+      "description": "Group GitHub Actions",
+      "groupName": "GitHub Actions",
+      "matchManagers": ["github-actions"]
+    },
+    {
+      "description": "Pin Go version more conservatively",
+      "matchDatasources": ["golang-version"],
+      "rangeStrategy": "pin"
+    },
+    {
+      "description": "Update Go version in go.mod",
+      "matchManagers": ["gomod"],
+      "matchDepTypes": ["golang"],
+      "rangeStrategy": "bump"
+    },
+    {
+      "description": "Group testing tools",
+      "groupName": "testing tools",
+      "matchPackageNames": [
+        "github.com/onsi/ginkgo",
+        "github.com/onsi/gomega",
+        "github.com/stretchr/testify"
+      ]
+    },
+    {
+      "description": "Security updates should be raised immediately",
+      "matchDatasources": ["go"],
+      "matchUpdateTypes": ["patch"],
+      "prPriority": 10,
+      "schedule": ["at any time"],
+      "labels": ["security", "priority/important"],
+      "minimumReleaseAge": "0 days",
+      "matchPackageNames": [
+        "golang.org/x/crypto",
+        "golang.org/x/net",
+        "github.com/golang-jwt/jwt",
+        "google.golang.org/protobuf"
+      ]
+    },
+    {
+      "description": "Be careful with Helm dependencies",
+      "matchDatasources": ["helm"],
+      "rangeStrategy": "bump",
+      "commitMessagePrefix": "chore(helm):"
+    },
+    {
+      "description": "Group linting tools",
+      "groupName": "linters",
+      "matchPackageNames": [
+        "golangci/golangci-lint",
+        "mvdan.cc/gofumpt",
+        "github.com/daixiang0/gci"
+      ]
+    },
+    {
+      "description": "Limit major updates",
+      "matchUpdateTypes": ["major"],
+      "dependencyDashboardApproval": true,
+      "labels": ["breaking-change"]
+    },
+    {
+      "description": "Replace directives should be updated carefully",
+      "matchManagers": ["gomod"],
+      "matchDepTypes": ["replace"],
+      "enabled": false
+    },
+    {
+      "description": "Update cert-manager images",
+      "matchDatasources": ["docker"],
+      "matchPackagePatterns": ["^quay.io/jetstack/cert-manager"],
+      "groupName": "cert-manager images"
+    }
+  ],
+  "regexManagers": [
+    {
+      "description": "Update Go version in Dockerfiles",
+      "fileMatch": ["(^|/)Dockerfile[^/]*$"],
+      "matchStrings": [
+        "FROM (?<depName>golang):(?<currentValue>[\\d.]+)(?:-(?<currentDigest>sha256:[a-f0-9]+))?(?:-(?<compatibility>alpine|bullseye))?\\s"
+      ],
+      "datasourceTemplate": "docker"
+    },
+    {
+      "description": "Update Go version in GitHub workflows",
+      "fileMatch": ["\\.github/workflows/[^/]+\\.ya?ml$"],
+      "matchStrings": ["go-version: ['\"]?(?<currentValue>[\\d.]+)['\"]?"],
+      "depNameTemplate": "golang",
+      "datasourceTemplate": "golang-version"
+    },
+    {
+      "description": "Update tool versions in Makefile",
+      "fileMatch": ["^Makefile$"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>[^\\s]+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s+[A-Z_]+_VERSION\\s*:?=\\s*v?(?<currentValue>[\\d.]+)"
+      ]
+    }
+  ],
+  "ignorePaths": [
+    "**/vendor/**",
+    "**/node_modules/**",
+    "**/__tests__/**",
+    "**/test/**"
+  ],
+  "prBodyDefinitions": {
+    "Package": "{{depName}}",
+    "Type": "{{depType}}",
+    "Update": "{{updateType}}",
+    "Current value": "{{currentValue}}",
+    "New value": "{{newValue}}",
+    "Change": "`{{displayFrom}}` -> `{{displayTo}}`",
+    "References": "{{references}}",
+    "Package file": "{{packageFile}}"
+  },
+  "prBodyColumns": ["Package", "Type", "Update", "Change", "References"],
+  "prBodyNotes": [
+    "**Note**: This PR was automatically created by Renovate Bot.",
+    "",
+    "Before merging:",
+    "- [ ] Ensure all tests pass",
+    "- [ ] Review the changelog/release notes of updated dependencies",
+    "- [ ] Check for any breaking changes",
+    "- [ ] Verify cert-manager still builds correctly"
+  ],
+  "ignoreDeps": ["launchpad.net/gocheck"],
+  "constraints": {
+    "go": ">=1.21"
+  }
+}
