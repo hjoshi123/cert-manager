@@ -1,16 +1,19 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["config:recommended", ":dependencyDashboard", ":gitSignOff"],
+  "enabled": true,
+  "extends": ["config:base", ":dependencyDashboard", ":gitSignOff"],
   "timezone": "Europe/London",
-  "schedule": ["* 22-23,0-4 * * *", "* * * * 0,6"],
   "labels": ["dependencies", "renovate"],
   "prConcurrentLimit": 5,
-  "prHourlyLimit": 2,
+  "prHourlyLimit": 0,
   "semanticCommits": "enabled",
   "semanticCommitScope": "deps",
   "onboarding": false,
   "platform": "github",
-  "automerge": true,
+  "repositories": ["hjoshi123/cert-manager"],
+  "baseBranchPatterns": ["feat/renovate-bot"],
+  "automerge": false,
+  "useBaseBranchConfig": "merge",
   "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"],
   "vulnerabilityAlerts": {
     "enabled": true,
@@ -22,14 +25,14 @@
       "description": "Group Kubernetes dependencies",
       "groupName": "kubernetes packages",
       "matchDatasources": ["go"],
-      "matchPackageNames": ["k8s.io/", "sigs.k8s.io/"],
+      "matchPackageNames": ["k8s.io/**", "sigs.k8s.io/**"],
       "groupSlug": "kubernetes"
     },
     {
       "description": "Group Azure SDK dependencies",
       "groupName": "Azure SDK",
       "matchDatasources": ["go"],
-      "matchPackagePrefixes": ["github.com/Azure/azure-sdk-for-go/"]
+      "matchPackagePrefixes": ["github.com/Azure/azure-sdk-for-go{/,}**"]
     },
     {
       "description": "Group AWS SDK dependencies",
@@ -40,14 +43,12 @@
     {
       "description": "Automerge patch updates for test dependencies",
       "matchDepTypes": ["devDependencies"],
-      "matchUpdateTypes": ["patch"],
-      "automerge": true
+      "matchUpdateTypes": ["patch"]
     },
     {
       "description": "Automerge digest updates",
       "matchDatasources": ["docker"],
-      "matchUpdateTypes": ["digest"],
-      "automerge": true
+      "matchUpdateTypes": ["digest"]
     },
     {
       "description": "Group GitHub Actions",
@@ -79,7 +80,6 @@
       "matchDatasources": ["go"],
       "matchUpdateTypes": ["patch"],
       "prPriority": 10,
-      "schedule": ["at any time"],
       "labels": ["security", "priority/important"],
       "minimumReleaseAge": "0 days",
       "matchPackageNames": [
@@ -119,32 +119,8 @@
     {
       "description": "Update cert-manager images",
       "matchDatasources": ["docker"],
-      "matchPackagePatterns": ["^quay.io/jetstack/cert-manager"],
+      "matchPackageNames": ["/^quay.io/jetstack/cert-manager/"],
       "groupName": "cert-manager images"
-    }
-  ],
-  "regexManagers": [
-    {
-      "description": "Update Go version in Dockerfiles",
-      "fileMatch": ["(^|/)Dockerfile[^/]*$"],
-      "matchStrings": [
-        "FROM (?<depName>golang):(?<currentValue>[\\d.]+)(?:-(?<currentDigest>sha256:[a-f0-9]+))?(?:-(?<compatibility>alpine|bullseye))?\\s"
-      ],
-      "datasourceTemplate": "docker"
-    },
-    {
-      "description": "Update Go version in GitHub workflows",
-      "fileMatch": ["\\.github/workflows/[^/]+\\.ya?ml$"],
-      "matchStrings": ["go-version: ['\"]?(?<currentValue>[\\d.]+)['\"]?"],
-      "depNameTemplate": "golang",
-      "datasourceTemplate": "golang-version"
-    },
-    {
-      "description": "Update tool versions in Makefile",
-      "fileMatch": ["^Makefile$"],
-      "matchStrings": [
-        "# renovate: datasource=(?<datasource>[a-z-]+?) depName=(?<depName>[^\\s]+?)(?: versioning=(?<versioning>[a-z-]+?))?\\s+[A-Z_]+_VERSION\\s*:?=\\s*v?(?<currentValue>[\\d.]+)"
-      ]
     }
   ],
   "ignorePaths": [
