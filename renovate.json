@@ -8,6 +8,9 @@
   "prHourlyLimit": 2,
   "semanticCommits": "enabled",
   "semanticCommitScope": "deps",
+  "onboarding": false,
+  "platform": "github",
+  "automerge": true,
   "postUpdateOptions": ["gomodTidy", "gomodUpdateImportPaths"],
   "vulnerabilityAlerts": {
     "enabled": true,
