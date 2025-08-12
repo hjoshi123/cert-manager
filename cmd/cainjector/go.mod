@@ -9,7 +9,7 @@ go 1.24.0
 replace github.com/cert-manager/cert-manager => ../../
 
 require (
-	github.com/cert-manager/cert-manager v0.0.0-00010101000000-000000000000
+	github.com/cert-manager/cert-manager v0.16.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.7
 	k8s.io/api v0.33.3
