@@ -13,7 +13,8 @@
   automerge: false,
   useBaseBranchConfig: "merge",
   postUpgradeTasks: {
-    commands: ["make generate"],
+    // This is a temporary fix to disable errors on a non interactive shell. Longer term, fix this in the makefiles-module.
+    commands: ["export PS1='> ' && make generate"],
     executionMode: "branch",
   },
   postUpdateOptions: ["gomodTidy", "gomodUpdateImportPaths"],
@@ -39,7 +40,7 @@
       groupSlug: "azure-sdk-go",
       enabled: true,
       automerge: true,
-      matchPackagePrefixes: ["github.com/Azure{/,}**"],
+      matchPackageNames: ["github.com/Azure{/,}**"],
     },
     {
       description: "Group Golang.org/x packages",
@@ -54,7 +55,14 @@
       matchDatasources: ["go"],
       enabled: true,
       groupSlug: "aws-sdk-go",
-      matchPackagePrefixes: ["github.com/aws/aws-sdk-go-v2{/,}**"],
+      matchPackageNames: ["github.com/aws{/,}**"],
+    },
+    {
+      description: "Group monitoring packages",
+      groupName: "monitoring",
+      groupSlug: "monitoring",
+      enabled: true,
+      matchPackageNames: ["github.com/prometheus{/,}**"]
     },
     {
       description: "Group GitHub Actions",
@@ -138,6 +146,10 @@
   },
   prBodyColumns: ["Package", "Type", "Update", "Change", "References"],
   prBodyNotes: [
+    "/kind cleanup",
+    "```release-note \
+    NONE \
+    ```",
     "**Note**: This PR was automatically created by Renovate Bot.",
     "",
     "Before merging:",
