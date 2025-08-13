@@ -8,7 +8,7 @@
   prHourlyLimit: 0,
   semanticCommits: "enabled",
   semanticCommitScope: "deps",
-  repositories: ["cert-manager/cert-manager"],
+  repositories: ["cert-manager/cert-manager", "hjoshi123/cert-manager"],
   automerge: false,
   useBaseBranchConfig: "merge",
   postUpgradeTasks: {
@@ -154,9 +154,7 @@
   prBodyColumns: ["Package", "Type", "Update", "Change", "References"],
   prBodyNotes: [
     "/kind cleanup",
-    "```release-note\n
-    NONE\n
-    ```",
+    "```release-note\nNONE\n```",
     "**Note**: This PR was automatically created by Renovate Bot.",
     "",
     "Before merging:",
