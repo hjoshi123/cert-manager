@@ -28,6 +28,8 @@ import (
 	"k8s.io/apimachinery/pkg/runtime"
 	utilerrors "k8s.io/apimachinery/pkg/util/errors"
 	"k8s.io/apimachinery/pkg/util/rand"
+	clientfeatures "k8s.io/client-go/features"
+	clientfeaturestesting "k8s.io/client-go/features/testing"
 	kubefake "k8s.io/client-go/kubernetes/fake"
 	metadatafake "k8s.io/client-go/metadata/fake"
 	"k8s.io/client-go/metadata/metadatainformer"
@@ -150,6 +152,8 @@ func (b *Builder) Init() {
 	// Fix the clock used in apiutil so that calls to set status conditions
 	// can be predictably tested
 	apiutil.Clock = b.Context.Clock
+	// TODO: we should fix our tests to hanlde WatchList by default
+	clientfeaturestesting.SetFeatureDuringTest(b.T, clientfeatures.WatchListClient, false)
 }
 
 // InitWithRESTConfig() will call builder.Init(), then assign an initialised
