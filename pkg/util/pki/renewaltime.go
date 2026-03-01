@@ -124,6 +124,10 @@ func applyRenewBeforeWithWindows(notAfter, notBefore, desiredRenewalTime time.Ti
 			return nil, fmt.Errorf("error parsing cron in window %s", err.Error())
 		}
 
+		if w.WindowDuration == nil || w.WindowDuration.Duration <= 0 {
+			return nil, fmt.Errorf("windowDuration must be a positive duration in window %v", w)
+		}
+
 		// Any renewal logic should only start after notBefore and before notAfter. Bounds are [notBefore - dur, notAfter + dur)
 		searchMin := notBefore.Add(-w.WindowDuration.Duration)
 		searchMax := notAfter.Add(w.WindowDuration.Duration)
