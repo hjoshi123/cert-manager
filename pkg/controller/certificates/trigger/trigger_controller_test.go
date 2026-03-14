@@ -395,19 +395,19 @@ func Test_controller_ProcessItem(t *testing.T) {
 			mockDataForCertificateReturn: policies.Input{},
 			mockShouldReissue: func(t *testing.T) policies.Func {
 				return func(gotInput policies.Input) (string, string, bool) {
-					return policies.WindowError, "Renewing certificate not possible due to window error", false
+					return policies.WindowError, "cannot find renewal time in window", true
 				}
 			},
 			wantEvent: []string{
-				"Warning WindowError Renewing certificate not possible due to window error",
-				"Normal Issuing Renewing certificate without satisfying renewal windows",
+				"Warning WindowError Renewing certificate without satisfying renewal windows due to cannot find renewal time in window",
+				"Normal Issuing Renewing certificate without satisfying renewal windows <nil>",
 			},
 			wantConditions: []cmapi.CertificateCondition{{
 				Type:               "Issuing",
 				ObservedGeneration: 42,
 				Status:             "True",
 				Reason:             "Renewing",
-				Message:            "Renewing certificate without satisfying renewal windows",
+				Message:            "Renewing certificate without satisfying renewal windows <nil>",
 				LastTransitionTime: &fixedNow,
 			}},
 		},
@@ -437,9 +437,6 @@ func Test_controller_ProcessItem(t *testing.T) {
 
 			// This is the default backoff duration set by the config API.
 			w.certificateRequestMinimumBackoffDuration = 1 * time.Hour
-
-			// This is the default value for all certificate renewals
-			w.certificateRenewOnWindowFailure = true
 
 			gotShouldReissueCalled := false
 			w.shouldReissue = func(i policies.Input) (string, string, bool) {
